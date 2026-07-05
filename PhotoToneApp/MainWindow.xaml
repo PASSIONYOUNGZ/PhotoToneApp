@@ -1,0 +1,573 @@
+<Window x:Class="PhotoToneApp.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d"
+        Title="PhotoToneApp" Height="760" Width="1220"
+        MinHeight="620" MinWidth="980"
+        Background="#F3F4F6"
+        PreviewKeyDown="Window_PreviewKeyDown">
+    <Window.Resources>
+        <SolidColorBrush x:Key="BorderBrushSoft" Color="#D1D5DB" />
+        <SolidColorBrush x:Key="TextMutedBrush" Color="#6B7280" />
+
+        <Style x:Key="ToolbarButtonStyle" TargetType="Button">
+            <Setter Property="MinWidth" Value="86" />
+            <Setter Property="Height" Value="32" />
+            <Setter Property="Padding" Value="12,0" />
+            <Setter Property="Margin" Value="0,0,8,0" />
+            <Setter Property="Background" Value="#FFFFFF" />
+            <Setter Property="BorderBrush" Value="{StaticResource BorderBrushSoft}" />
+            <Setter Property="BorderThickness" Value="1" />
+            <Setter Property="Cursor" Value="Hand" />
+        </Style>
+
+        <Style x:Key="FilterButtonStyle" TargetType="Button">
+            <Setter Property="Height" Value="32" />
+            <Setter Property="Margin" Value="0,0,0,6" />
+            <Setter Property="Padding" Value="12,0" />
+            <Setter Property="HorizontalContentAlignment" Value="Left" />
+            <Setter Property="Background" Value="#FFFFFF" />
+            <Setter Property="BorderBrush" Value="{StaticResource BorderBrushSoft}" />
+            <Setter Property="BorderThickness" Value="1" />
+            <Setter Property="Cursor" Value="Hand" />
+        </Style>
+
+        <Style x:Key="ActionButtonStyle" TargetType="Button">
+            <Setter Property="Height" Value="34" />
+            <Setter Property="MinWidth" Value="78" />
+            <Setter Property="Padding" Value="12,0" />
+            <Setter Property="Margin" Value="0,0,8,0" />
+            <Setter Property="Background" Value="#FFFFFF" />
+            <Setter Property="BorderBrush" Value="{StaticResource BorderBrushSoft}" />
+            <Setter Property="BorderThickness" Value="1" />
+            <Setter Property="Cursor" Value="Hand" />
+        </Style>
+
+        <Style TargetType="ListBoxItem">
+            <Setter Property="Padding" Value="0" />
+            <Setter Property="Margin" Value="0" />
+            <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+            <Setter Property="VerticalContentAlignment" Value="Stretch" />
+            <Setter Property="Background" Value="Transparent" />
+            <Setter Property="BorderThickness" Value="0" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="ListBoxItem">
+                        <Border x:Name="ItemBorder"
+                                Margin="6"
+                                Background="{TemplateBinding Background}"
+                                BorderBrush="Transparent"
+                                BorderThickness="2"
+                                CornerRadius="6">
+                            <ContentPresenter />
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsSelected" Value="True">
+                                <Setter TargetName="ItemBorder" Property="BorderBrush" Value="#2563EB" />
+                                <Setter TargetName="ItemBorder" Property="Background" Value="#EFF6FF" />
+                            </Trigger>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="ItemBorder" Property="BorderBrush" Value="#93C5FD" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </Window.Resources>
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="56" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="30" />
+        </Grid.RowDefinitions>
+
+        <Border Grid.Row="0"
+                Background="#FFFFFF"
+                BorderBrush="{StaticResource BorderBrushSoft}"
+                BorderThickness="0,0,0,1"
+                Padding="14,10">
+            <DockPanel LastChildFill="True">
+                <Button x:Name="OpenFolderButton"
+                        Content="打开文件夹"
+                        Style="{StaticResource ToolbarButtonStyle}"
+                        Click="OpenFolderButton_Click" />
+
+                <TextBox x:Name="SearchTextBox"
+                         Width="240"
+                         Height="32"
+                         Margin="0,0,8,0"
+                         Padding="10,6"
+                         VerticalContentAlignment="Center"
+                         TextChanged="SearchTextBox_TextChanged" />
+
+                <Button x:Name="RefreshButton"
+                        Content="刷新"
+                        Style="{StaticResource ToolbarButtonStyle}"
+                        Click="RefreshButton_Click" />
+
+                <TextBlock Text="排序"
+                           VerticalAlignment="Center"
+                           Margin="4,0,6,0"
+                           Foreground="{StaticResource TextMutedBrush}" />
+
+                <ComboBox x:Name="SortComboBox"
+                          Width="120"
+                          Height="32"
+                          Margin="0,0,10,0"
+                          SelectedIndex="0"
+                          SelectionChanged="SortComboBox_SelectionChanged">
+                    <ComboBoxItem Content="文件名" />
+                    <ComboBoxItem Content="修改时间" />
+                    <ComboBoxItem Content="文件大小" />
+                    <ComboBoxItem Content="宽度" />
+                    <ComboBoxItem Content="高度" />
+                    <ComboBoxItem Content="评分" />
+                </ComboBox>
+
+                <ComboBox x:Name="ExportModeComboBox"
+                          Width="132"
+                          Height="32"
+                          Margin="0,0,8,0"
+                          SelectedIndex="0">
+                    <ComboBoxItem Content="导出当前显示" />
+                    <ComboBoxItem Content="导出收藏" />
+                    <ComboBoxItem Content="导出入选" />
+                    <ComboBoxItem Content="导出3星以上" />
+                    <ComboBoxItem Content="导出5星" />
+                </ComboBox>
+
+                <Button x:Name="ExportButton"
+                        Content="导出"
+                        Style="{StaticResource ToolbarButtonStyle}"
+                        Click="ExportButton_Click" />
+
+                <TextBlock x:Name="CurrentFolderTextBlock"
+                           VerticalAlignment="Center"
+                           Foreground="{StaticResource TextMutedBrush}"
+                           TextTrimming="CharacterEllipsis" />
+            </DockPanel>
+        </Border>
+
+        <Grid Grid.Row="1">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="150" />
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="340" />
+            </Grid.ColumnDefinitions>
+
+            <Border Grid.Column="0"
+                    Background="#F9FAFB"
+                    BorderBrush="{StaticResource BorderBrushSoft}"
+                    BorderThickness="0,0,1,0"
+                    Padding="12">
+                <ScrollViewer VerticalScrollBarVisibility="Auto">
+                    <StackPanel>
+                        <TextBlock Text="状态筛选"
+                                   FontSize="15"
+                                   FontWeight="SemiBold"
+                                   Margin="0,0,0,10" />
+
+                        <Button Content="全部" Tag="全部" CommandParameter="Status" Style="{StaticResource FilterButtonStyle}" Click="StatusFilterButton_Click" />
+                        <Button Content="收藏" Tag="收藏" CommandParameter="Status" Style="{StaticResource FilterButtonStyle}" Click="StatusFilterButton_Click" />
+                        <Button Content="入选" Tag="入选" CommandParameter="Status" Style="{StaticResource FilterButtonStyle}" Click="StatusFilterButton_Click" />
+                        <Button Content="淘汰" Tag="淘汰" CommandParameter="Status" Style="{StaticResource FilterButtonStyle}" Click="StatusFilterButton_Click" />
+                        <Button Content="未评分" Tag="未评分" CommandParameter="Status" Style="{StaticResource FilterButtonStyle}" Click="StatusFilterButton_Click" />
+                        <Button Content="3星以上" Tag="3星以上" CommandParameter="Status" Style="{StaticResource FilterButtonStyle}" Click="StatusFilterButton_Click" />
+                        <Button Content="4星以上" Tag="4星以上" CommandParameter="Status" Style="{StaticResource FilterButtonStyle}" Click="StatusFilterButton_Click" />
+                        <Button Content="5星" Tag="5星" CommandParameter="Status" Style="{StaticResource FilterButtonStyle}" Click="StatusFilterButton_Click" />
+
+                        <TextBlock Text="颜色筛选"
+                                   FontSize="15"
+                                   FontWeight="SemiBold"
+                                   Margin="0,12,0,10" />
+
+                        <Button Content="全部颜色" Tag="全部" CommandParameter="Color" Style="{StaticResource FilterButtonStyle}" Click="ColorFilterButton_Click" />
+                        <Button Content="红色" Tag="红色" CommandParameter="Color" Style="{StaticResource FilterButtonStyle}" Click="ColorFilterButton_Click" />
+                        <Button Content="橙色" Tag="橙色" CommandParameter="Color" Style="{StaticResource FilterButtonStyle}" Click="ColorFilterButton_Click" />
+                        <Button Content="黄色" Tag="黄色" CommandParameter="Color" Style="{StaticResource FilterButtonStyle}" Click="ColorFilterButton_Click" />
+                        <Button Content="绿色" Tag="绿色" CommandParameter="Color" Style="{StaticResource FilterButtonStyle}" Click="ColorFilterButton_Click" />
+                        <Button Content="青色" Tag="青色" CommandParameter="Color" Style="{StaticResource FilterButtonStyle}" Click="ColorFilterButton_Click" />
+                        <Button Content="蓝色" Tag="蓝色" CommandParameter="Color" Style="{StaticResource FilterButtonStyle}" Click="ColorFilterButton_Click" />
+                        <Button Content="紫色" Tag="紫色" CommandParameter="Color" Style="{StaticResource FilterButtonStyle}" Click="ColorFilterButton_Click" />
+                        <Button Content="粉色" Tag="粉色" CommandParameter="Color" Style="{StaticResource FilterButtonStyle}" Click="ColorFilterButton_Click" />
+                        <Button Content="棕色" Tag="棕色" CommandParameter="Color" Style="{StaticResource FilterButtonStyle}" Click="ColorFilterButton_Click" />
+                        <Button Content="黑色" Tag="黑色" CommandParameter="Color" Style="{StaticResource FilterButtonStyle}" Click="ColorFilterButton_Click" />
+                        <Button Content="白色" Tag="白色" CommandParameter="Color" Style="{StaticResource FilterButtonStyle}" Click="ColorFilterButton_Click" />
+                        <Button Content="灰色" Tag="灰色" CommandParameter="Color" Style="{StaticResource FilterButtonStyle}" Click="ColorFilterButton_Click" />
+                        <Button Content="多色" Tag="多色" CommandParameter="Color" Style="{StaticResource FilterButtonStyle}" Click="ColorFilterButton_Click" />
+
+                        <TextBlock Text="图片形态"
+                                   FontSize="15"
+                                   FontWeight="SemiBold"
+                                   Margin="0,12,0,10" />
+
+                        <Button Content="全部形态" Tag="全部" CommandParameter="Orientation" Style="{StaticResource FilterButtonStyle}" Click="OrientationFilterButton_Click" />
+                        <Button Content="横图" Tag="横图" CommandParameter="Orientation" Style="{StaticResource FilterButtonStyle}" Click="OrientationFilterButton_Click" />
+                        <Button Content="竖图" Tag="竖图" CommandParameter="Orientation" Style="{StaticResource FilterButtonStyle}" Click="OrientationFilterButton_Click" />
+                        <Button Content="方图" Tag="方图" CommandParameter="Orientation" Style="{StaticResource FilterButtonStyle}" Click="OrientationFilterButton_Click" />
+                        <Button Content="16:9" Tag="16:9" CommandParameter="Orientation" Style="{StaticResource FilterButtonStyle}" Click="OrientationFilterButton_Click" />
+                        <Button Content="9:16" Tag="9:16" CommandParameter="Orientation" Style="{StaticResource FilterButtonStyle}" Click="OrientationFilterButton_Click" />
+
+                        <TextBlock Text="尺寸质量"
+                                   FontSize="15"
+                                   FontWeight="SemiBold"
+                                   Margin="0,12,0,10" />
+
+                        <Button Content="全部尺寸" Tag="全部" CommandParameter="Resolution" Style="{StaticResource FilterButtonStyle}" Click="ResolutionFilterButton_Click" />
+                        <Button Content="小图" Tag="小图" CommandParameter="Resolution" Style="{StaticResource FilterButtonStyle}" Click="ResolutionFilterButton_Click" />
+                        <Button Content="普通图" Tag="普通图" CommandParameter="Resolution" Style="{StaticResource FilterButtonStyle}" Click="ResolutionFilterButton_Click" />
+                        <Button Content="高清图" Tag="高清图" CommandParameter="Resolution" Style="{StaticResource FilterButtonStyle}" Click="ResolutionFilterButton_Click" />
+                        <Button Content="大图" Tag="大图" CommandParameter="Resolution" Style="{StaticResource FilterButtonStyle}" Click="ResolutionFilterButton_Click" />
+                    </StackPanel>
+                </ScrollViewer>
+            </Border>
+
+            <Border Grid.Column="1" Padding="14" Background="#F3F4F6">
+                <ListBox x:Name="ImageListBox"
+                         ItemsSource="{Binding VisibleImages}"
+                         SelectionChanged="ImageListBox_SelectionChanged"
+                         MouseDoubleClick="ImageListBox_MouseDoubleClick"
+                         Background="Transparent"
+                         BorderThickness="0"
+                         ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+                         ScrollViewer.VerticalScrollBarVisibility="Auto">
+                    <ListBox.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <WrapPanel IsItemsHost="True" />
+                        </ItemsPanelTemplate>
+                    </ListBox.ItemsPanel>
+                    <ListBox.ItemTemplate>
+                        <DataTemplate>
+                            <Border Width="170"
+                                    Height="270"
+                                    Padding="10"
+                                    Background="#FFFFFF"
+                                    BorderBrush="{StaticResource BorderBrushSoft}"
+                                    BorderThickness="1"
+                                    CornerRadius="6">
+                                <Grid>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="104" />
+                                        <RowDefinition Height="Auto" />
+                                        <RowDefinition Height="Auto" />
+                                        <RowDefinition Height="Auto" />
+                                        <RowDefinition Height="Auto" />
+                                        <RowDefinition Height="Auto" />
+                                        <RowDefinition Height="Auto" />
+                                    </Grid.RowDefinitions>
+
+                                    <Border Grid.Row="0"
+                                            Background="#E5E7EB"
+                                            BorderBrush="#CBD5E1"
+                                            BorderThickness="1"
+                                            CornerRadius="4">
+                                        <Image Source="{Binding ThumbnailPath}"
+                                               Stretch="UniformToFill" />
+                                    </Border>
+
+                                    <TextBlock Grid.Row="1"
+                                               Text="{Binding FileName}"
+                                               FontWeight="SemiBold"
+                                               Margin="0,10,0,4"
+                                               TextTrimming="CharacterEllipsis" />
+
+                                    <TextBlock Grid.Row="2"
+                                               Text="{Binding ToneLabel}"
+                                               Foreground="{StaticResource TextMutedBrush}"
+                                               TextTrimming="CharacterEllipsis" />
+
+                                    <Grid Grid.Row="3" Margin="0,4,0,0">
+                                        <TextBlock Text="未评分"
+                                                   Foreground="{StaticResource TextMutedBrush}">
+                                            <TextBlock.Style>
+                                                <Style TargetType="TextBlock">
+                                                    <Setter Property="Visibility" Value="Collapsed" />
+                                                    <Style.Triggers>
+                                                        <DataTrigger Binding="{Binding Rating}" Value="0">
+                                                            <Setter Property="Visibility" Value="Visible" />
+                                                        </DataTrigger>
+                                                    </Style.Triggers>
+                                                </Style>
+                                            </TextBlock.Style>
+                                        </TextBlock>
+                                        <TextBlock Text="{Binding Rating, StringFormat=评分：{0}星}"
+                                                   Foreground="{StaticResource TextMutedBrush}">
+                                            <TextBlock.Style>
+                                                <Style TargetType="TextBlock">
+                                                    <Setter Property="Visibility" Value="Visible" />
+                                                    <Style.Triggers>
+                                                        <DataTrigger Binding="{Binding Rating}" Value="0">
+                                                            <Setter Property="Visibility" Value="Collapsed" />
+                                                        </DataTrigger>
+                                                    </Style.Triggers>
+                                                </Style>
+                                            </TextBlock.Style>
+                                        </TextBlock>
+                                    </Grid>
+
+                                    <TextBlock Grid.Row="4"
+                                               Foreground="{StaticResource TextMutedBrush}"
+                                               Margin="0,4,0,0">
+                                        <TextBlock.Inlines>
+                                            <Run Text="{Binding OrientationLabel}" />
+                                            <Run Text=" / " />
+                                            <Run Text="{Binding ResolutionLabel}" />
+                                        </TextBlock.Inlines>
+                                    </TextBlock>
+
+                                    <StackPanel Grid.Row="5" Orientation="Horizontal" Margin="0,4,0,0">
+                                        <TextBlock Text="入选"
+                                                   Foreground="#15803D"
+                                                   FontWeight="SemiBold"
+                                                   Margin="0,0,8,0">
+                                            <TextBlock.Style>
+                                                <Style TargetType="TextBlock">
+                                                    <Setter Property="Visibility" Value="Collapsed" />
+                                                    <Style.Triggers>
+                                                        <DataTrigger Binding="{Binding IsPicked}" Value="True">
+                                                            <Setter Property="Visibility" Value="Visible" />
+                                                        </DataTrigger>
+                                                    </Style.Triggers>
+                                                </Style>
+                                            </TextBlock.Style>
+                                        </TextBlock>
+                                        <TextBlock Text="淘汰"
+                                                   Foreground="#B91C1C"
+                                                   FontWeight="SemiBold">
+                                            <TextBlock.Style>
+                                                <Style TargetType="TextBlock">
+                                                    <Setter Property="Visibility" Value="Collapsed" />
+                                                    <Style.Triggers>
+                                                        <DataTrigger Binding="{Binding IsRejected}" Value="True">
+                                                            <Setter Property="Visibility" Value="Visible" />
+                                                        </DataTrigger>
+                                                    </Style.Triggers>
+                                                </Style>
+                                            </TextBlock.Style>
+                                        </TextBlock>
+                                    </StackPanel>
+
+                                    <TextBlock Grid.Row="6"
+                                               Margin="0,4,0,0">
+                                        <TextBlock.Style>
+                                            <Style TargetType="TextBlock">
+                                                <Setter Property="Text" Value="未收藏" />
+                                                <Setter Property="Foreground" Value="{StaticResource TextMutedBrush}" />
+                                                <Style.Triggers>
+                                                    <DataTrigger Binding="{Binding IsFavorite}" Value="True">
+                                                        <Setter Property="Text" Value="已收藏" />
+                                                        <Setter Property="Foreground" Value="#B45309" />
+                                                    </DataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </TextBlock.Style>
+                                    </TextBlock>
+                                </Grid>
+                            </Border>
+                        </DataTemplate>
+                    </ListBox.ItemTemplate>
+                </ListBox>
+            </Border>
+
+            <Border Grid.Column="2"
+                    Background="#FFFFFF"
+                    BorderBrush="{StaticResource BorderBrushSoft}"
+                    BorderThickness="1,0,0,0"
+                    Padding="16">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="230" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="*" />
+                        <RowDefinition Height="Auto" />
+                    </Grid.RowDefinitions>
+
+                    <Border Grid.Row="0"
+                            Background="#E5E7EB"
+                            BorderBrush="#CBD5E1"
+                            BorderThickness="1"
+                            CornerRadius="6">
+                        <Grid>
+                            <Image x:Name="PreviewImage"
+                                   Stretch="Uniform" />
+                            <TextBlock x:Name="PreviewPlaceholderTextBlock"
+                                       Text="大图预览"
+                                       FontSize="18"
+                                       Foreground="#6B7280"
+                                       HorizontalAlignment="Center"
+                                       VerticalAlignment="Center"
+                                       IsHitTestVisible="False" />
+                        </Grid>
+                    </Border>
+
+                    <TextBlock Grid.Row="1"
+                               Text="图片信息"
+                               FontSize="16"
+                               FontWeight="SemiBold"
+                               Margin="0,16,0,10" />
+
+                    <Grid Grid.Row="2">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                        </Grid.RowDefinitions>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="72" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+
+                        <TextBlock Grid.Row="0" Grid.Column="0" Text="文件名" Foreground="{StaticResource TextMutedBrush}" Margin="0,0,10,10" />
+                        <TextBlock x:Name="DetailFileNameTextBlock" Grid.Row="0" Grid.Column="1" TextWrapping="Wrap" Margin="0,0,0,10" />
+
+                        <TextBlock Grid.Row="1" Grid.Column="0" Text="路径" Foreground="{StaticResource TextMutedBrush}" Margin="0,0,10,10" />
+                        <TextBlock x:Name="DetailFilePathTextBlock" Grid.Row="1" Grid.Column="1" TextWrapping="Wrap" Margin="0,0,0,10" />
+
+                        <TextBlock Grid.Row="2" Grid.Column="0" Text="尺寸" Foreground="{StaticResource TextMutedBrush}" Margin="0,0,10,10" />
+                        <TextBlock x:Name="DetailDimensionsTextBlock" Grid.Row="2" Grid.Column="1" Margin="0,0,0,10" />
+
+                        <TextBlock Grid.Row="3" Grid.Column="0" Text="大小" Foreground="{StaticResource TextMutedBrush}" Margin="0,0,10,10" />
+                        <TextBlock x:Name="DetailFileSizeTextBlock" Grid.Row="3" Grid.Column="1" Margin="0,0,0,10" />
+
+                        <TextBlock Grid.Row="4" Grid.Column="0" Text="主色调" Foreground="{StaticResource TextMutedBrush}" Margin="0,0,10,10" />
+                        <StackPanel Grid.Row="4" Grid.Column="1" Orientation="Horizontal" Margin="0,0,0,10">
+                            <Border x:Name="DetailDominantColorSwatch"
+                                    Width="18"
+                                    Height="18"
+                                    Background="#000000"
+                                    BorderBrush="{StaticResource BorderBrushSoft}"
+                                    BorderThickness="1"
+                                    Margin="0,0,8,0" />
+                            <TextBlock x:Name="DetailToneTextBlock" VerticalAlignment="Center" />
+                        </StackPanel>
+
+                        <TextBlock Grid.Row="5" Grid.Column="0" Text="收藏" Foreground="{StaticResource TextMutedBrush}" Margin="0,0,10,10" />
+                        <TextBlock x:Name="DetailFavoriteTextBlock" Grid.Row="5" Grid.Column="1" Margin="0,0,0,10" />
+
+                        <TextBlock Grid.Row="6" Grid.Column="0" Text="评分" Foreground="{StaticResource TextMutedBrush}" Margin="0,0,10,10" />
+                        <TextBlock x:Name="DetailRatingTextBlock" Grid.Row="6" Grid.Column="1" Margin="0,0,0,10" />
+
+                        <TextBlock Grid.Row="7" Grid.Column="0" Text="入选" Foreground="{StaticResource TextMutedBrush}" Margin="0,0,10,10" />
+                        <TextBlock x:Name="DetailPickedTextBlock" Grid.Row="7" Grid.Column="1" Margin="0,0,0,10" />
+
+                        <TextBlock Grid.Row="8" Grid.Column="0" Text="淘汰" Foreground="{StaticResource TextMutedBrush}" Margin="0,0,10,10" />
+                        <TextBlock x:Name="DetailRejectedTextBlock" Grid.Row="8" Grid.Column="1" Margin="0,0,0,10" />
+
+                        <TextBlock Grid.Row="9" Grid.Column="0" Text="形态" Foreground="{StaticResource TextMutedBrush}" Margin="0,0,10,10" />
+                        <TextBlock x:Name="DetailOrientationTextBlock" Grid.Row="9" Grid.Column="1" Margin="0,0,0,10" />
+
+                        <TextBlock Grid.Row="10" Grid.Column="0" Text="尺寸质量" Foreground="{StaticResource TextMutedBrush}" Margin="0,0,10,10" />
+                        <TextBlock x:Name="DetailResolutionTextBlock" Grid.Row="10" Grid.Column="1" Margin="0,0,0,10" />
+                    </Grid>
+
+                    <StackPanel Grid.Row="3" Margin="0,14,0,0">
+                        <Border Background="#F9FAFB"
+                                BorderBrush="{StaticResource BorderBrushSoft}"
+                                BorderThickness="1"
+                                Padding="10"
+                                Margin="0,0,0,10">
+                            <StackPanel>
+                                <TextBlock Text="对比选择"
+                                           FontWeight="SemiBold"
+                                           Margin="0,0,0,6" />
+                                <TextBlock x:Name="CompareLeftText"
+                                           Text="左图：未选择"
+                                           Foreground="{StaticResource TextMutedBrush}"
+                                           TextTrimming="CharacterEllipsis"
+                                           Margin="0,0,0,4" />
+                                <TextBlock x:Name="CompareRightText"
+                                           Text="右图：未选择"
+                                           Foreground="{StaticResource TextMutedBrush}"
+                                           TextTrimming="CharacterEllipsis" />
+                            </StackPanel>
+                        </Border>
+
+                        <WrapPanel>
+                            <Button x:Name="SetCompareLeftButton"
+                                    Content="设为左图"
+                                    Style="{StaticResource ActionButtonStyle}"
+                                    Click="SetCompareLeftButton_Click" />
+                            <Button x:Name="SetCompareRightButton"
+                                    Content="设为右图"
+                                    Style="{StaticResource ActionButtonStyle}"
+                                    Click="SetCompareRightButton_Click" />
+                            <Button x:Name="ClearCompareButton"
+                                    Content="清空对比"
+                                    Style="{StaticResource ActionButtonStyle}"
+                                    Click="ClearCompareButton_Click" />
+                            <Button x:Name="CompareButton"
+                                    Content="双图对比"
+                                    Style="{StaticResource ActionButtonStyle}"
+                                    Click="CompareButton_Click" />
+                            <Button x:Name="OpenViewerButton"
+                                    Content="大图查看"
+                                    Style="{StaticResource ActionButtonStyle}"
+                                    Click="OpenViewerButton_Click" />
+                            <Button x:Name="FavoriteButton"
+                                    Content="收藏"
+                                    Style="{StaticResource ActionButtonStyle}"
+                                    Click="FavoriteButton_Click" />
+                            <Button x:Name="RenameButton"
+                                    Content="重命名"
+                                    Style="{StaticResource ActionButtonStyle}"
+                                    Click="RenameButton_Click" />
+                            <Button x:Name="DeleteButton"
+                                    Content="删除"
+                                    Style="{StaticResource ActionButtonStyle}"
+                                    Click="DeleteButton_Click" />
+                            <Button Content="1星" Tag="1" Style="{StaticResource ActionButtonStyle}" Click="RatingButton_Click" />
+                            <Button Content="2星" Tag="2" Style="{StaticResource ActionButtonStyle}" Click="RatingButton_Click" />
+                            <Button Content="3星" Tag="3" Style="{StaticResource ActionButtonStyle}" Click="RatingButton_Click" />
+                            <Button Content="4星" Tag="4" Style="{StaticResource ActionButtonStyle}" Click="RatingButton_Click" />
+                            <Button Content="5星" Tag="5" Style="{StaticResource ActionButtonStyle}" Click="RatingButton_Click" />
+                            <Button Content="清除评分" Style="{StaticResource ActionButtonStyle}" Click="ClearRatingButton_Click" />
+                            <Button x:Name="PickButton" Content="入选" Style="{StaticResource ActionButtonStyle}" Click="PickButton_Click" />
+                            <Button x:Name="RejectButton" Content="淘汰" Style="{StaticResource ActionButtonStyle}" Click="RejectButton_Click" />
+                        </WrapPanel>
+                    </StackPanel>
+                </Grid>
+            </Border>
+        </Grid>
+
+        <StatusBar Grid.Row="2"
+                   Background="#FFFFFF"
+                   BorderBrush="{StaticResource BorderBrushSoft}"
+                   BorderThickness="0,1,0,0">
+            <StatusBarItem>
+                <TextBlock x:Name="TotalImagesStatusTextBlock" />
+            </StatusBarItem>
+            <Separator />
+            <StatusBarItem>
+                <TextBlock x:Name="VisibleImagesStatusTextBlock" />
+            </StatusBarItem>
+            <Separator />
+            <StatusBarItem>
+                <TextBlock x:Name="FilterStatusTextBlock" />
+            </StatusBarItem>
+            <Separator />
+            <StatusBarItem>
+                <TextBlock x:Name="SearchStatusTextBlock" />
+            </StatusBarItem>
+            <Separator />
+            <StatusBarItem>
+                <TextBlock x:Name="SelectedImageStatusTextBlock" />
+            </StatusBarItem>
+            <Separator />
+            <StatusBarItem>
+                <TextBlock x:Name="CurrentStatusTextBlock" />
+            </StatusBarItem>
+        </StatusBar>
+    </Grid>
+</Window>
